@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
 import base64
 from cryptography import x509
@@ -15,7 +15,7 @@ app = FastAPI()
 
 @app.get("/")
 async def index():
-    return {"team": "OTA Project",
+    return {"team": "OTA Project 😊",
             "message": "Hello World! welcome to our Server"}
 
 
@@ -104,11 +104,14 @@ def cert_chain_generate(root_id,binary_data):
     SB_der_cert = cert.public_bytes(serialization.Encoding.DER)
     return Root_der_cert,SB_der_cert,signature_bin
 
-class file_(BaseModel):
+class file_meta(BaseModel):
     name: str
     content: bytes
-@app.post("/uploadfile/")
-async def create_upload_file(metaDataFile: file_):
+    password: str
+@app.post("/sign/")
+async def create_upload_file(metaDataFile: file_meta):
+    if(metaDataFile.password !="123456789"):
+        return HTTPException(405,"not vaild password")
     binary_data = base64.b64decode(metaDataFile.content)
     root_index = chr(binary_data[0x26])
     Root_der_cert,SB_der_cert,signature_bin = cert_chain_generate(root_index,binary_data)
