@@ -111,7 +111,7 @@ class file_meta(BaseModel):
 @app.post("/sign/")
 async def create_upload_file(metaDataFile: file_meta):
     if(metaDataFile.password !="123456789"):
-        return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="not vaild password")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="not vaild password")
     binary_data = base64.b64decode(metaDataFile.content)
     root_index = chr(binary_data[0x26])
     Root_der_cert,SB_der_cert,signature_bin = cert_chain_generate(root_index,binary_data)
