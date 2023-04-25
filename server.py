@@ -15,7 +15,8 @@ app = FastAPI()
 
 @app.get("/")
 async def index():
-    return {"message": "Hello World! welcome to our Server"}
+    return {"team": "OTA Project",
+            "message": "Hello World! welcome to our Server"}
 
 
 def cert_chain_generate(root_id,binary_data):
