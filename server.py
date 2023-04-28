@@ -104,11 +104,12 @@ def cert_chain_generate(root_id,binary_data):
     SB_der_cert = cert.public_bytes(serialization.Encoding.DER)
     return Root_der_cert,SB_der_cert,signature_bin
 
+
 class file_meta(BaseModel):
     name: str
     content: bytes
     password: str
-@app.post("/sign/")
+@app.post("/sign_ing/")
 async def create_upload_file(metaDataFile: file_meta):
     if(metaDataFile.password !="123456789"):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="not vaild password")
