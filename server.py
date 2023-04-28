@@ -109,7 +109,7 @@ class file_meta(BaseModel):
     name: str
     content: bytes
     password: str
-@app.post("/sign_ing/")
+@app.post("/sign/")
 async def create_upload_file(metaDataFile: file_meta):
     if(metaDataFile.password !="123456789"):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="not vaild password")
