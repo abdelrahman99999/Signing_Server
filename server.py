@@ -113,13 +113,11 @@ class file_meta(BaseModel):
 async def create_upload_file(metaDataFile: file_meta):
     if(metaDataFile.password !="123456789"):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="not vaild password")
-#     binary_data = base64.b64decode(metaDataFile.content)
-#     root_index = chr(binary_data[0x26])
-#     Root_der_cert,SB_der_cert,signature_bin = cert_chain_generate(root_index,binary_data)
-#     signature_base64 = base64.b64encode(signature_bin).decode('utf-8')
-#     Root_der_cert_base64 =base64.b64encode(Root_der_cert).decode('utf-8')
-#     SB_der_cert_base64 =base64.b64encode(SB_der_cert).decode('utf-8')
-#     return {"ROOT_DER_CERT": Root_der_cert_base64,"SB_DER_CERT": SB_der_cert_base64,"SIGNATURE":signature_base64}
-    return {"x":"y"}
-
+    binary_data = base64.b64decode(metaDataFile.content)
+    root_index = chr(binary_data[0x26])
+    Root_der_cert,SB_der_cert,signature_bin = cert_chain_generate(root_index,binary_data)
+    signature_base64 = base64.b64encode(signature_bin).decode('utf-8')
+    Root_der_cert_base64 =base64.b64encode(Root_der_cert).decode('utf-8')
+    SB_der_cert_base64 =base64.b64encode(SB_der_cert).decode('utf-8')
+    return {"ROOT_DER_CERT": Root_der_cert_base64,"SB_DER_CERT": SB_der_cert_base64,"SIGNATURE":signature_base64}
 
