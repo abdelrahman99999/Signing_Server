@@ -13,6 +13,11 @@ from Crypto.PublicKey import RSA
 
 app = FastAPI()
 
+users = [{"username":"Abdelrahman",
+          "password":"15e2b0d3c33891ebb0f1ef609ec419420c20e320ce94c65fbc8c3312448eb225"},
+          {"username":"Alaa",
+          "password":"8a9bcf1e51e812d0af8465a8dbcc9f741064bf0af3b3d08e6b0246437c19f7fb"}]
+
 @app.get("/")
 async def index():
     return {"team": "OTA Project 😊",
@@ -104,20 +109,30 @@ def cert_chain_generate(root_id,binary_data):
     SB_der_cert = cert.public_bytes(serialization.Encoding.DER)
     return Root_der_cert,SB_der_cert,signature_bin
 
+def check_credentials(username,password):
+    for user in users:
+        if  user["username"] == username :
+            hased_value = SHA256.new(password.encode('utf-8'))
+            if user["password"] == hased_value.hexdigest():
+                return True
+    return False
 
 class file_meta(BaseModel):
     name: str
     content: bytes
+    username: str
     password: str
 @app.post("/sign/")
 async def create_upload_file(metaDataFile: file_meta):
-    if(metaDataFile.password !="123456789"):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="not vaild password")
+    if(check_credentials(metaDataFile.username ,metaDataFile.password) != True):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Not Valid Credentials")
     binary_data = base64.b64decode(metaDataFile.content)
     root_index = chr(binary_data[0x26])
     Root_der_cert,SB_der_cert,signature_bin = cert_chain_generate(root_index,binary_data)
+
     signature_base64 = base64.b64encode(signature_bin).decode('utf-8')
     Root_der_cert_base64 =base64.b64encode(Root_der_cert).decode('utf-8')
     SB_der_cert_base64 =base64.b64encode(SB_der_cert).decode('utf-8')
     return {"ROOT_DER_CERT": Root_der_cert_base64,"SB_DER_CERT": SB_der_cert_base64,"SIGNATURE":signature_base64}
+
 
