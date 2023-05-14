@@ -1,3 +1,6 @@
+'''
+IMPORTS
+'''
 from fastapi import FastAPI,HTTPException,status
 from pydantic import BaseModel
 import base64
@@ -11,19 +14,30 @@ from Crypto.Signature import pkcs1_15
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
 
+'''
+FASTAPI APPLICATION
+'''
 app = FastAPI()
 
+'''
+USERS & PASSWORDS HASHS
+'''
 users = [{"username":"Abdelrahman",
           "password":"15e2b0d3c33891ebb0f1ef609ec419420c20e320ce94c65fbc8c3312448eb225"},
           {"username":"Alaa",
           "password":"8a9bcf1e51e812d0af8465a8dbcc9f741064bf0af3b3d08e6b0246437c19f7fb"}]
 
+'''
+GET REQUEST
+'''
 @app.get("/")
 async def index():
     return {"team": "OTA Project 😊",
             "message": "Hello World! welcome to our Server"}
 
-
+'''
+FUNCTION TO GENERATE 2 CERTIFICATE CHAIN AND SIGNATURE
+'''
 def cert_chain_generate(root_id,binary_data):
     if(root_id == '1'):
         with open('private_root_key1.pem', 'rb') as f:
@@ -109,6 +123,9 @@ def cert_chain_generate(root_id,binary_data):
     SB_der_cert = cert.public_bytes(serialization.Encoding.DER)
     return Root_der_cert,SB_der_cert,signature_bin
 
+'''
+FUNCTION TO CHECK CREDENTIALS OF THE POST REQUEST USER
+'''
 def check_credentials(username,password):
     for user in users:
         if  user["username"] == username :
@@ -116,12 +133,18 @@ def check_credentials(username,password):
             if user["password"] == hased_value.hexdigest():
                 return True
     return False
-
+'''
+CLASS USED FOR POST REQUEST DATA
+'''
 class file_meta(BaseModel):
     name: str
     content: bytes
     username: str
     password: str
+          
+'''
+POST REQUEST
+'''
 @app.post("/sign/")
 async def create_upload_file(metaDataFile: file_meta):
     if(check_credentials(metaDataFile.username ,metaDataFile.password) != True):
